@@ -12,8 +12,8 @@ validate_directories = function(){
   }
 }
 
-WORKING_DIRECTORY = '/media/ncw135/DATA/PublicRepositories/geodatasets'
-DATA_DIR = file.path(WORKING_DIRECTORY, 'data/GSE107864')
+WORKING_DIRECTORY = '/media/ncw135/DATA/PublicRepositories/SingleCellBreastCancer'
+DATA_DIR = file.path(WORKING_DIRECTORY, 'data')
 QUANT_DIR = file.path(DATA_DIR, 'quants')
 MCF7_QUANTS = file.path(QUANT_DIR, 'MCF7s')
 T47D_QUANTS = file.path(QUANT_DIR, 'T47Ds')
