@@ -5,11 +5,11 @@ library(Seurat)
 source('global_variables.R')
 
 data = readRDS(RDS_FILE)
-mcf7 = data[['mcf7']]
-t47d = data[['t47d']]
+mcf7 = data$mcf7$single_cell
+t47d = data$t47d$single_cell
 
 
-mcf7.seurat <- CreateSeuratObject(counts = data[['mcf7']]$counts, project = "mcf7", min.cells = 3, min.features = 200)
+mcf7.seurat <- CreateSeuratObject(counts = mcf7$counts, project = "mcf7", min.cells = 3, min.features = 200)
 mcf7.seurat
 
 tot_counts = colSums(mcf7$counts)
