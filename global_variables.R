@@ -14,6 +14,8 @@ validate_directories = function(){
 
 WORKING_DIRECTORY = '/media/ncw135/DATA/SingleCellBreastCancer'
 DATA_DIR = file.path(WORKING_DIRECTORY, 'data')
+PLOTS_DIR = file.path(WORKING_DIRECTORY, 'plots')
+QC_PLOTS = file.path(PLOTS_DIR, 'QCplots')
 QUANT_DIR = file.path(DATA_DIR, 'quants')
 MCF7_QUANTS = file.path(QUANT_DIR, 'MCF7s')
 T47D_QUANTS = file.path(QUANT_DIR, 'T47Ds')
@@ -26,6 +28,8 @@ SAVED_OBJECTS = file.path(WORKING_DIRECTORY, 'SavedObjects')
 RDS_FILE = file.path(SAVED_OBJECTS, 'POST_SALMON_DATA.rds')
 MCF7_ANNOTATION_DATA_FILE = file.path(SAVED_OBJECTS, 'MCF7_ANNOTATION_DATA.rds')
 T47D_ANNOTATION_DATA_FILE = file.path(SAVED_OBJECTS, 'T47D_ANNOTATION_DATA.rds')
+PHENO_DATA = file.path(SAVED_OBJECTS, 'PHENO_DATA.rds')
+
 
 # get ensemble ids for input into annotation function
 ENSEMBL_ID_CSV = file.path(SAVED_OBJECTS, 'ensembl_ids.csv')
