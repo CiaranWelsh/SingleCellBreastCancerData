@@ -16,6 +16,8 @@ WORKING_DIRECTORY = '/media/ncw135/DATA/SingleCellBreastCancer'
 DATA_DIR = file.path(WORKING_DIRECTORY, 'data')
 PLOTS_DIR = file.path(WORKING_DIRECTORY, 'plots')
 QC_PLOTS = file.path(PLOTS_DIR, 'QCplots')
+
+
 QUANT_DIR = file.path(DATA_DIR, 'quants')
 MCF7_QUANTS = file.path(QUANT_DIR, 'MCF7s')
 T47D_QUANTS = file.path(QUANT_DIR, 'T47Ds')
@@ -44,3 +46,16 @@ T47D_BULK_DATA_IDS = c('SRR6301155', 'SRR6301201',
 
 # will throw error if any of these files/folders do not exist
 validate_directories()
+
+
+COLOURS = list(
+  '0'='red',
+  '3'='blue',
+  '6'='green', 
+  '12'='purple'
+)
+
+
+
+
+

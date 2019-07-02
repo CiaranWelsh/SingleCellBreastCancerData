@@ -1,13 +1,17 @@
 library(Seurat)
 library(cowplot)
 
-# Take a dataframe as input. Expects the dataframe to have multiple columns labelled the same
-# Output list of dataframes that has split the big dataframe by unique colnames
+# split a dataframe into smaller dataframes that have the same colname in the original df
+# args
+# ----
+# df: dataframe to be split. Must have duplicate colnames. In context, the duplicate colnames are time
+# returns: a list of dataframes
 subset_dataframe = function(df){
   unique_colnames = unique(colnames(df))
   l = list()
   for (i in unique_colnames){
     l[[i]] = df[, colnames(df) == i]
+    colnames(l[[i]]) = 1:dim(l[[i]])[2]
   }
   return (l)
 }
@@ -35,6 +39,19 @@ create_seurat_objects = function(counts_list, project_name){
   return (l)
 }
 
+# iterate over a list of suerat objects and calculate the percentages of mitochondrial contamination per cell
+# 
+# args
+# ----
+# seurat_obj_list: list of SeuratObjects. Output from create_seurat_objects
+# returns(list): list of SeuratObjects containing the mt.percentages 
+calc_mt_percentage = function(seurat_obj_list){
+  for (i in names(seurat_obj_list)){
+    seurat_obj_list[[i]][['percent.mt']] = PercentageFeatureSet(seurat_obj_list[[i]], pattern = '^MT-')
+  }
+  return (seurat_obj_list)
+}
+
 
 ########################################################################
 source('global_variables.R')
@@ -47,11 +64,6 @@ pd = readRDS(PHENO_DATA)
 pd.mcf7 = pd$pd_mcf7.single_cell
 pd.t47d = pd$pd_t47d.single_cell
 
-# 
-mcf7_non0_genes = rownames(mcf7$counts[apply(mcf7$counts!=0, 1, all),])
-t47d_non0_genes = rownames(t47d$counts[apply(t47d$counts!=0, 1, all),])
-t47d_non0_genes
-
 # split data back into cell line data
 mcf7 = data$mcf7.single_cell
 t47d = data$t47d.single_cell
@@ -60,42 +72,113 @@ t47d = data$t47d.single_cell
 mcf7.counts = mcf7$counts
 t47d.counts = t47d$counts
 
+# collect genes names that have a signal
+mcf7_non0_genes = rownames(mcf7.counts[apply(mcf7.counts!=0, 1, all),])
+t47d_non0_genes = rownames(t47d.counts[apply(t47d.counts!=0, 1, all),])
+t47d_non0_genes
+
 # rename count matrices with time column
 colnames(mcf7.counts) = as.numeric(pd.mcf7$time)
 colnames(t47d.counts) = as.numeric(pd.t47d$time)
 
-
+# split data by time point of estrogen stimulation
 mcf7.counts.split = subset_dataframe(mcf7.counts)
 t47d.counts.split = subset_dataframe(t47d.counts)
 
-
-
+# create some seurat objects. One per time point of stimulation
 mcf7.seurat = create_seurat_objects(mcf7.counts.split, 'mcf7')
 t47d.seurat = create_seurat_objects(t47d.counts.split, 't47d')
+mcf7.seurat
+# calculate the percentage of mitochondrial contamination in each time point
+mcf7.seurat = calc_mt_percentage(mcf7.seurat)
+t47d.seurat = calc_mt_percentage(t47d.seurat)
 
-# iterate over a list of suerat objects and calculate the percentages of mitochondrial contamination per cell
-# 
-# args
-# ----
-# seurat_obj_list: list of SeuratObjects. Output from create_seurat_objects
-# returns(list): list of SeuratObjects containing the mt.percentages 
-calc_mt_percentage = function(seurat_obj_list){
-  l = list()
-  for (i in names(seurat_obj_list)){
-    seurat_obj_list[[i]][['percent.mt']] = PercentageFeatureSet(seurat_obj_list[[i]], pattern = '^MT-')
+plot_qc_vln_plots = function(seurat_obj_list, name){
+  names = names(seurat_obj_list)
+
+  for (i in 1:length(names)){
+    colour_names = names(COLOURS)
+    fname = file.path(QC_PLOTS, paste0(name, '_', names[i], '.jpeg'))
+    jpeg(filename = fname, height=800, width=800)
+    v = VlnPlot(
+        seurat_obj_list[[i]],
+        features = c("nFeature_RNA", "nCount_RNA", "percent.mt", 'IDO1'),
+        ncol = 4,
+        cols = COLOURS[[colour_names[i]]],
+        pt.size = 4
+      )  
+    # outputs to device
+    print(v)
+    message(paste('saved to ', fname))
+    dev.off()
   }
-  return (l)
+}
+# plot qc metrics
+plot_qc_vln_plots(mcf7.seurat, 'mcf7')
+plot_qc_vln_plots(t47d.seurat, 't47d')
+
+
+remove_bad_cells = function(seurat_obj_list, cell='mcf7'){
+  if (cell == 'mcf7'){
+    for (i in 1:length(seurat_obj_list)){
+      seurat_obj_list[[i]] = subset(
+        seurat_obj_list[[i]],
+        percent.mt < 10 & nCount_RNA > 1e6
+        )
+    }
+  } else if (cell == 't47d'){
+    for (i in 1:length(seurat_obj_list)){
+      seurat_obj_list[[i]] = subset(
+        seurat_obj_list[[i]],
+        percent.mt < 20
+        )
+      }
+    }else {
+      stop('me no likey')
+    }
+  return (seurat_obj_list)
 }
 
-calc_mt_percentage(mcf7.seurat)
+mcf7.seurat.subset = remove_bad_cells(mcf7.seurat, cell='mcf7')
+t47d.seurat.subset = remove_bad_cells(t47d.seurat, cell='t47d')
 
+# replot qc metrics
+plot_qc_vln_plots(mcf7.seurat.subset, 'mcf7')
+plot_qc_vln_plots(t47d.seurat.subset, 't47d')
 
-# The [[ operator can add columns to object metadata. This is a great place to stash QC stats
-# The [[ operator can add columns to object metadata. This is a great place to stash QC stats
-mcf7.seurat[["percent.mt"]] <- PercentageFeatureSet(mcf7.seurat, pattern = "^MT-")
-t47d.seurat[["percent.mt"]] <- PercentageFeatureSet(t47d.seurat, pattern = "^MT-")
+# print out object metadata
+x = mcf7.seurat.subset$`0`@meta.data
+x = x[order(x['nCount_RNA'], decreasing = T), ]
+x
 
-FindIntegrationAnchors(mcf7.seurat, dims=1:15)
+y = t47d.seurat.subset$`12`@meta.data
+y = y[order(y['nFeature_RNA'], decreasing = T), ]
+y
+
+normalise_data = function(seurat_obj_list){
+  names = names(seurat_obj_list)
+  for (i in 1:length(names)){
+    seurat_obj_list[[names[i]]] = NormalizeData(seurat_obj_list[[names[i]]]) 
+  }
+  return(seurat_obj_list)
+}
+find_variable_features = function(seurat_obj_list){
+  names = names(seurat_obj_list)
+  for (i in 1:length(names)){
+    seurat_obj_list[[names[i]]] = FindVariableFeatures(
+      seurat_obj_list[[names[i]]], selection.method = "vst", nfeatures = 2000
+      ) 
+  }
+  return(seurat_obj_list)
+}
+
+mcf7.seurat.norm = normalise_data(mcf7.seurat.subset)
+t47d.seurat.norm = normalise_data(t47d.seurat.subset)
+t47d.seurat.norm
+
+mcf7.anchors = FindIntegrationAnchors(mcf7.seurat, dims=1:15)
+t47d.anchors = FindIntegrationAnchors(t47d.seurat, dims=1:15)
+mcf7.seurat.subset
 
 '
 machine learning problem
