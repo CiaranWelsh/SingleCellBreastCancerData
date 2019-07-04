@@ -55,7 +55,10 @@ COLOURS = list(
   '12'='purple'
 )
 
+# directory to contain UMAP plots of different dimensionaltiy
+UMAPS_DIR = file.path(PLOTS_DIR, 'UMAPs')
 
-
+# saved integrated dataset
+DATA_NORMED_AND_INTEGRATED = file.path(SAVED_OBJECTS, 'normalised_seurat_obj.rd')
 
 

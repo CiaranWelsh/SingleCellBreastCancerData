@@ -39,7 +39,6 @@ get_pheno_data = function(){
   pd_t47d.single_cell = pd_t47d[!(rownames(pd_t47d) %in% T47D_BULK_DATA_IDS), ]  
   
   pd_mcf7.bulk['time'] = unlist(lapply(as.character(pd_mcf7.bulk['Library_Name']), FUN = function(x) strsplit(x, '_')[[1]][2]))
-
   # print(pd_mcf7.bulk['Library_Name'])
   mcf7_bulk_labels = lapply(as.character(pd_mcf7.bulk[,'Library_Name']), FUN = function(x) strsplit(x, '_')[[1]])
   pd_mcf7.bulk['condition'] = unlist(lapply(mcf7_bulk_labels, FUN = function(x) x[3]))
@@ -48,7 +47,7 @@ get_pheno_data = function(){
   
   t47d_bulk_labels = lapply(as.character(pd_t47d.bulk[,'Library_Name']), FUN = function(x) strsplit(x, '_')[[1]])
   pd_t47d.bulk['condition'] = unlist(lapply(t47d_bulk_labels, FUN = function(x) x[3]))
-  pd_t47d.bulk['time'] = unlist(lapply(t47d_bulk_labels, FUN = function(x) strsplit(x[2], 'M')))
+  pd_t47d.bulk['time'] = unlist(lapply(t47d_bulk_labels, FUN = function(x) strsplit(x[2], 'h')))
   pd_t47d.bulk['cell_id'] = unlist(lapply(t47d_bulk_labels, FUN = function(x) x[1]))
   
   mcf7_single_cell_labels = lapply(as.character(pd_mcf7.single_cell$Library_Name), FUN = function(x) strsplit(x, '_')[[1]])
@@ -59,11 +58,18 @@ get_pheno_data = function(){
   pd_t47d.single_cell['cell_id'] = unlist(lapply(t47d_single_cell_labels, FUN = function(x) x[1]))
   pd_t47d.single_cell['time'] = unlist(lapply(t47d_single_cell_labels, FUN = function(x) strsplit(x[2], 'h')))
   
+  pd_mcf7.bulk['time'] = as.numeric(pd_mcf7.bulk[,'time'])
+  pd_t47d.bulk['time'] = as.numeric(pd_t47d.bulk[,'time'])
+  pd_mcf7.single_cell['time'] = as.numeric(pd_mcf7.single_cell[,'time'])
+  pd_t47d.single_cell['time'] = as.numeric(pd_t47d.single_cell[,'time'])
+  #print(pd_t47d.bulk)
+  
   return(list(pd_mcf7.bulk = pd_mcf7.bulk, 
               pd_mcf7.single_cell = pd_mcf7.single_cell, 
               pd_t47d.bulk = pd_t47d.bulk, 
               pd_t47d.single_cell = pd_t47d.single_cell))
 }
+#pd = get_pheno_data()
 
 
 #get annotation
@@ -109,15 +115,11 @@ read_data = function(pd, annot){
                          # countsFromAbundance = 'lengthScaledTPM'
   ))
 }
-t47d.bulk = read_data(pd$pd_t47d.bulk, t47d_annot)
-
-
-  
-# mcf7_data = read_data(pd$pd_mcf7.single_cell, mcf7_annot)
+#t47d.bulk = read_data(pd$pd_t47d.bulk, t47d_annot)
+#mcf7_data = read_data(pd$pd_mcf7.single_cell, mcf7_annot)
 
 
 #######################################################################################################
-
 
 # get pd with correct path to quant files
 pd = get_pheno_data()
@@ -139,7 +141,7 @@ t47d.single_cell = read_data(pd$pd_t47d.single_cell, t47d_annot)
 mcf7.bulk = read_data(pd$pd_mcf7.bulk, mcf7_annot)
 t47d.bulk = read_data(pd$pd_t47d.bulk, t47d_annot)
 
-pd$pd_t47d.bulk
+#pd$pd_t47d.bulk
 
 data = list(mcf7.single_cell=mcf7.single_cell, 
             t47d.single_cell=t47d.single_cell)
