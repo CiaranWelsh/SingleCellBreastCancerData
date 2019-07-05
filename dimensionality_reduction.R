@@ -5,7 +5,6 @@ library(Seurat)
 source('global_variables.R')
 
 data = readRDS(DATA_NORMED_AND_INTEGRATED)
-
 data <- JackStraw(data, num.replicate = 100)
 data <- ScoreJackStraw(data, dims = 1:20)
 JackStrawPlot(data, dims = 1:10)
@@ -52,22 +51,27 @@ for (i in 2:20){
   message(paste('plotting', i))
   data = plot_dim_reduction(
     data, 'normed', 'umap', 
-    save = T, dims = 1:i, #group.by = 'time'
+    save = T, dims = 1:i #group.by = 'time'
     )
 }
-data.not_norm = plot_dim_reduction(
-  data.not_norm, 'not_normed', 'umap', save = T, 
-  dims=1:3, group.by = 'cell_line')
 
 data = plot_dim_reduction(data, 'normed', 'pca', save = T)
-data.not_norm = plot_dim_reduction(data.not_norm, 'not_normed', 'pca', save = T)
 
 data.c1_markers <- FindMarkers(data, ident.1 = 1, ident.2=0, min.pct = 0.25)
 deg = rownames(data.c1_markers[data.c1_markers$p_val_adj < 0.001,])
 deg
-VlnPlot(data, features = c('BRCA1', sample(deg, 8)), 
-        ncol = 3, group.by = c('cell_line', 'time'), 
+data@meta.data
+VlnPlot(data, features = c('BRCA1', deg[1:8]),#sample(deg, 8)), 
+        ncol = 3, group.by = 'seurat_clusters', 
         log = T)
+RidgePlot(data, features = c('BRCA1', deg[1:8]), 
+          group.by = 'cell_line')
+FeatureScatter(data, feature1 = "UBE2T", feature2 = "CDK1", 
+               group.by = 'cell_line'
+               )
+
+?RidgePlot
+Think about copying the code for one of their plots and producing a time series plotter
 
 FeaturePlot(data, features = c('BRCA1', sample(deg, 3)))
 # is there any structure in the data due to time? 
