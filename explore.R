@@ -7,28 +7,28 @@ library(gage)
 source('global_variables.R')
 
 data = readRDS(DATA_NORMED_AND_INTEGRATED)
-pi3k_genes = c('PIK3CA', 'AKT1', 'IRS1',
-               'PDK1', 'MTOR', 'TSC2', 
-               'AKT1S1', 'RPS6KB1', 'EIF4EBP1')
-mapk_genes = c(
-  'RAF1', 'MAP2K1', 'MAPK1', 
-  'MAPK14', 'ESR1', 'ESR2'
-)
-
-pi3k_time = VlnPlot(data, features = pi3k_genes, group.by = 'time')
-mapk_time = VlnPlot(data, features = mapk_genes, group.by = 'time')
-pi3k_cell_line = VlnPlot(data, features = pi3k_genes, group.by = 'cell_line')
-mapk_cell_line = VlnPlot(data, features = mapk_genes, group.by = 'cell_line')
-
-pi3k_time_file = file.path(VIOLIN_PLOTS_DIR, 'pi3k_genes_time.jpeg')
-mapk_time_file = file.path(VIOLIN_PLOTS_DIR, 'mapk_genes_time.jpeg')
-pi3k_cell_line_file = file.path(VIOLIN_PLOTS_DIR, 'pi3k_genes_cell_line.jpeg')
-mapk_cell_line_file = file.path(VIOLIN_PLOTS_DIR, 'mapk_genes_cell_line.jpeg')
-
-ggsave(pi3k_time_file, plot = pi3k_time, height = 15, width = 15)
-ggsave(mapk_time_file, plot = mapk_time, height = 15, width = 15)
-ggsave(pi3k_cell_line_file, plot = pi3k_cell_line, height = 15, width = 15)
-ggsave(mapk_cell_line_file, plot = mapk_cell_line, height = 15, width = 15)
+# pi3k_genes = c('PIK3CA', 'AKT1', 'IRS1',
+#                'PDK1', 'MTOR', 'TSC2', 
+#                'AKT1S1', 'RPS6KB1', 'EIF4EBP1')
+# mapk_genes = c(
+#   'RAF1', 'MAP2K1', 'MAPK1', 
+#   'MAPK14', 'ESR1', 'ESR2'
+# )
+# 
+# pi3k_time = VlnPlot(data, features = pi3k_genes, group.by = 'time')
+# mapk_time = VlnPlot(data, features = mapk_genes, group.by = 'time')
+# pi3k_cell_line = VlnPlot(data, features = pi3k_genes, group.by = 'cell_line')
+# mapk_cell_line = VlnPlot(data, features = mapk_genes, group.by = 'cell_line')
+# 
+# pi3k_time_file = file.path(VIOLIN_PLOTS_DIR, 'pi3k_genes_time.jpeg')
+# mapk_time_file = file.path(VIOLIN_PLOTS_DIR, 'mapk_genes_time.jpeg')
+# pi3k_cell_line_file = file.path(VIOLIN_PLOTS_DIR, 'pi3k_genes_cell_line.jpeg')
+# mapk_cell_line_file = file.path(VIOLIN_PLOTS_DIR, 'mapk_genes_cell_line.jpeg')
+# 
+# ggsave(pi3k_time_file, plot = pi3k_time, height = 15, width = 15)
+# ggsave(mapk_time_file, plot = mapk_time, height = 15, width = 15)
+# ggsave(pi3k_cell_line_file, plot = pi3k_cell_line, height = 15, width = 15)
+# ggsave(mapk_cell_line_file, plot = mapk_cell_line, height = 15, width = 15)
 # , split.by = 'cell_line')  
 
 plot_all_vln = function(data, features, ncols = 1, nperplot = 3, prefix='', ...){
