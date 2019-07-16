@@ -15,6 +15,7 @@ validate_directories = function(){
 WORKING_DIRECTORY = '/media/ncw135/DATA/SingleCellBreastCancer'
 DATA_DIR = file.path(WORKING_DIRECTORY, 'data')
 PLOTS_DIR = file.path(WORKING_DIRECTORY, 'plots')
+VIOLIN_PLOTS_DIR = file.path(PLOTS_DIR, 'violin_plots')
 QC_PLOTS = file.path(PLOTS_DIR, 'QCplots')
 
 
@@ -61,4 +62,13 @@ UMAPS_DIR = file.path(PLOTS_DIR, 'UMAPs')
 # saved integrated dataset
 DATA_NORMED_AND_INTEGRATED = file.path(SAVED_OBJECTS, 'normalised_seurat_obj.rd')
 
+# list of pheno data variables that we want to remove
+# UNWANTED_PD_VARIABLES = c('quant_file', 'tissue', 'sex', 
+#                           'biomaterial_provider', 'SRA_Study', 
+#                           'ReleaseDate', 'Organism', 'LoadData', 
+#                           'LibrarySource', 'DATASTORE_region',
+#                           'InsertSize', 'Instrument', 'LibraryLayout',
+#                           'LibrarySelection', Center_Name Consent DATASTORE_filetype DATASTORE_provider)
+PD_VARS_TO_KEEP = c('Run', 'Library_Name', 'MBases', 'MBytes', 'SRA_Sample',
+                    'Sample_Name', 'time', 'cell_line', 'condition')
 

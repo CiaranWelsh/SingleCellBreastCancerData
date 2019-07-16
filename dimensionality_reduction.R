@@ -5,6 +5,11 @@ library(Seurat)
 source('global_variables.R')
 
 data = readRDS(DATA_NORMED_AND_INTEGRATED)
+data <- RunPCA(data, features = rownames(data))
+?data
+
+?RunPCA
+data[[]]
 data <- JackStraw(data, num.replicate = 100)
 data <- ScoreJackStraw(data, dims = 1:20)
 JackStrawPlot(data, dims = 1:10)

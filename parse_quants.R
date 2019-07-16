@@ -69,9 +69,9 @@ get_pheno_data = function(){
               pd_t47d.bulk = pd_t47d.bulk, 
               pd_t47d.single_cell = pd_t47d.single_cell))
 }
-#pd = get_pheno_data()
+pd = get_pheno_data()
 
-
+colnames(pd$pd_mcf7.single_cell)
 #get annotation
 get_annotation = function(ensemble_ids, annotation_file, overwrite=F){
   ensemble_ids_no_dot = gsub("\\.[0-9]$", "", ensemble_ids)
@@ -123,10 +123,7 @@ read_data = function(pd, annot){
 
 # get pd with correct path to quant files
 pd = get_pheno_data()
-saveRDS(pd, PHENO_DATA)
-pd
 
-names(pd)
 # get annotation data
 t47d_ensembl_ids = read.csv(as.character(pd$pd_t47d.single_cell$quant_file[1]), sep='\t')[, 'Name']
 mcf7_ensembl_ids = read.csv(as.character(pd$pd_mcf7.single_cell$quant_file[1]), sep='\t')[, 'Name']
@@ -141,11 +138,15 @@ t47d.single_cell = read_data(pd$pd_t47d.single_cell, t47d_annot)
 mcf7.bulk = read_data(pd$pd_mcf7.bulk, mcf7_annot)
 t47d.bulk = read_data(pd$pd_t47d.bulk, t47d_annot)
 
-#pd$pd_t47d.bulk
+# Subset the pheno dataframes
+for (i in 1:length(pd)){
+  pd[[i]] = pd[[i]][PD_VARS_TO_KEEP]
+}
 
 data = list(mcf7.single_cell=mcf7.single_cell, 
             t47d.single_cell=t47d.single_cell)
 # save data to rds files
+saveRDS(pd, PHENO_DATA)
 saveRDS(data, file = RDS_FILE )
 
 

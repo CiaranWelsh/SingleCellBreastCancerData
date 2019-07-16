@@ -51,7 +51,7 @@ raw_fastq_files/
 
 reference_genome/
 
-SavedObjects/
+#SavedObjects/
 
 fastqc_results/
 
